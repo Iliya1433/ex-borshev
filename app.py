@@ -25,7 +25,25 @@ def load_user(user_id):
 # Импортируем маршруты
 from routes import *
 
+# Инициализируем директории и базу данных при запуске
+with app.app_context():
+    # Создаем необходимые директории
+    from init_dirs import init_directories
+    init_directories()
+    
+    # Создаем все таблицы
+    db.create_all()
+    
+    # Проверяем, есть ли данные в базе
+    from models import Book
+    if not Book.query.first():
+        # Если база пустая, запускаем скрипты инициализации
+        from init_db import init_db
+        from add_initial_data import add_initial_data
+        from add_covers import add_covers
+        init_db()
+        add_initial_data()
+        add_covers()
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True) 
